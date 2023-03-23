@@ -22,30 +22,34 @@ cookiesConsent = WebDriverWait(driver, 10).until(
 cookiesConsent.click()
 
 # Choosing a language - waiting till the element appears
-language_eng = WebDriverWait(driver, 10).until(
+language = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.ID, "langSelect-EN")))
-language_eng.click()
+language.click()
 
 
-# Finding an item helping with getting cookies
-item = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, 'productPrice0')))
+# Finding multiple items from the shop
+items =[]
+for i in range(1,-1,-1):
+    items.append(WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, f'productPrice{i}'))))
+
 driver.implicitly_wait(3)
 
 # Clicking the "Big cookie"
-for i in range(300):
-    cookie = driver.find_element(By.ID, 'bigCookie')
+for i in range(1000):
+    cookie = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'bigCookie')))
     cookie.click()
     
     # Checking the cookie count
-    cookie_count = driver.find_element(By.XPATH, "(//div[@id='cookies'])[1]")
-    current_count = int(cookie_count.text.split(' ')[0])
-    price = int(item.text)
+    for item in items:
+        cookie_count = driver.find_element(By.XPATH, "(//div[@id='cookies'])[1]")
+        current_count = int(cookie_count.text.split(' ')[0])
+        price = int(item.text)
 
-    # Checking if there is enough cookies to buy an item
-    if current_count > price:
-        actions = ActionChains(driver)
-        actions.click(item)
-        actions.perform()
+        # Checking if there is enough cookies to buy an item
+        if current_count > price:
+                actions = ActionChains(driver)
+                actions.click(item)
+                actions.perform()
 
 
 print(cookie_count.text)
